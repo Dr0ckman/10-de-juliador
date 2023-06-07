@@ -104,16 +104,18 @@ def configurar():
 
 
 root = Tk()
-root.geometry("550x200")
+root.geometry("430x130")
 root.title("Configurar archivos actualizacion")
 root.resizable(0, 0)
 
 frmIzq = ttk.Frame(root, padding=20, borderwidth=0)
 frmIzq.grid(column=0, row=0, sticky='nw')
 frmDer = ttk.Frame(root, padding=20, borderwidth=0)
-frmDer.grid(column=2, row=0, sticky='ne')
+frmDer.grid(column=2, row=0, sticky='ew')
+frmRadioButtons = ttk.Frame(root, padding=20, borderwidth=0)
+frmRadioButtons.grid(column=3, row=0, sticky='ne')
 
-ttk.Label(frmIzq, text="ID Sucursal").grid(column=0, row=0, sticky='w', pady=(4, 3))
+ttk.Label(frmIzq, text="ID Sucursal").grid(column=0, row=0, sticky='w', pady=(0, 0))
 inputUsuario = StringVar()
 
 opcionesCBox = []
@@ -121,23 +123,23 @@ for id in cur.execute("select id from Hoja1"):
     opcionesCBox.append(id)
 
 entryIDSucursal = ttk.Combobox(frmDer, state="readonly",textvariable=inputUsuario, values=opcionesCBox)
-entryIDSucursal.grid(column=0, row=0)
+entryIDSucursal.grid(column=0, row=0, sticky='ew')
 entryIDSucursal.bind("<<ComboboxSelected>>", verificar)
 
-ttk.Label(frmIzq, text="Nombre Sucursal").grid(column=0, row=1, pady=(4, 3), sticky='w')
+ttk.Label(frmIzq, text="Nombre Sucursal").grid(column=0, row=1, pady=(4, 4), sticky='w')
 textoEntryNombreSucursal = StringVar()
-entryNombreSucursal = ttk.Entry(frmDer, state="disabled", textvariable=textoEntryNombreSucursal).grid(column=0, row=1) # Configurar esto cuando se ingrese el ID para que muestre el nombre de sucursal
+entryNombreSucursal = ttk.Entry(frmDer, state="disabled", textvariable=textoEntryNombreSucursal).grid(column=0, row=1, sticky='ew') # Configurar esto cuando se ingrese el ID para que muestre el nombre de sucursal
 
 ttk.Label(frmIzq, text="Nombre Equipo").grid(column=0, row=2, sticky='w')
 
 textoEntryNombreEquipo = StringVar()
-entryNombreEquipo = ttk.Entry(frmDer, state="disabled", textvariable=textoEntryNombreEquipo).grid(column=0, row=3)
+entryNombreEquipo = ttk.Entry(frmDer, state="disabled", textvariable=textoEntryNombreEquipo).grid(column=0, row=3, sticky='ew')
 
 buttonConfigurar = ttk.Button(frmDer, text="Configurar archivos", command=configurar).grid(column=0, row=4, sticky='ew')
 
 selected = StringVar()
 selected.set("Maestro")
-ttk.Radiobutton(frmDer, text="Esclavo", value="Esclavo",variable=selected, command=lambda: verificar(None)).grid(column=3, row=0, sticky='e')
-ttk.Radiobutton(frmDer, text="Maestro", value="Maestro",variable=selected, command=lambda: verificar(None)).grid(column=2, row=0, sticky='e', padx=(10,0))
+ttk.Radiobutton(frmRadioButtons, text="Esclavo", value="Esclavo",variable=selected, command=lambda: verificar(None)).grid(column=0, row=1, sticky='w')
+ttk.Radiobutton(frmRadioButtons, text="Maestro", value="Maestro",variable=selected, command=lambda: verificar(None)).grid(column=0, row=0, sticky='w')
 
 root.mainloop()
