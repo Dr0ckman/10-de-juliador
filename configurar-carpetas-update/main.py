@@ -1,6 +1,7 @@
 import sqlite3
 import os
 from tkinter import *
+from tkinter import messagebox
 from tkinter import ttk
 
 # Tomar carpetas de 10 de Julio y cambiar archivos dependiendo de ID e IP que se encuentra en db.
@@ -14,30 +15,7 @@ from tkinter import ttk
 db = sqlite3.connect('db.db')
 cur = db.cursor()
 
-root = Tk()
-root.geometry("550x200")
-root.title("Configurar archivos actualizacion")
-root.resizable(0, 0)
-
-frmIzq = ttk.Frame(root, padding=20, borderwidth=0)
-frmIzq.grid(column=0, row=0, sticky='nw')
-frmDer = ttk.Frame(root, padding=20, borderwidth=0)
-frmDer.grid(column=2, row=0, sticky='ne')
-
-ttk.Label(frmIzq, text="ID Sucursal").grid(column=0, row=0, sticky='w', pady=(4, 3))
-inputUsuario = StringVar()
-
-opcionesCBox = []
-for id in cur.execute("select id from Hoja1"):
-    opcionesCBox.append(id)
-
-entryIDSucursal = ttk.Combobox(frmDer, textvariable=inputUsuario, values=opcionesCBox).grid(column=0, row=0)
-
-ttk.Label(frmIzq, text="Nombre Sucursal").grid(column=0, row=1, pady=(4, 3), sticky='w')
-textoEntryNombreSucursal = StringVar()
-entryNombreSucursal = ttk.Entry(frmDer, state="disabled", textvariable=textoEntryNombreSucursal).grid(column=0, row=1) # Configurar esto cuando se ingrese el ID para que muestre el nombre de sucursal
-
-ttk.Label(frmIzq, text="Nombre Equipo").grid(column=0, row=2, sticky='w')
+# Funciones
 
 def isMaestro():
     if selected.get() == "Maestro":
@@ -86,7 +64,7 @@ def generateIp():
 
     return ip
 
-def verificar():
+def verificar(event):
     nombreSucursal = generateNombreSucursal()
     textoEntryNombreSucursal.set(nombreSucursal)
     nombreEquipo = generateNombreEquipo()
@@ -122,7 +100,35 @@ def configurar():
         f.write(fileContents)
         f.close()
 
-      
+    messagebox.showinfo(message="Archivos configurados con datos:\n\nIP: " + str(generateIp()) + "\nID: " + str(generateNombreEquipo()), title="Archivos generados correctamente")
+
+
+root = Tk()
+root.geometry("550x200")
+root.title("Configurar archivos actualizacion")
+root.resizable(0, 0)
+
+frmIzq = ttk.Frame(root, padding=20, borderwidth=0)
+frmIzq.grid(column=0, row=0, sticky='nw')
+frmDer = ttk.Frame(root, padding=20, borderwidth=0)
+frmDer.grid(column=2, row=0, sticky='ne')
+
+ttk.Label(frmIzq, text="ID Sucursal").grid(column=0, row=0, sticky='w', pady=(4, 3))
+inputUsuario = StringVar()
+
+opcionesCBox = []
+for id in cur.execute("select id from Hoja1"):
+    opcionesCBox.append(id)
+
+entryIDSucursal = ttk.Combobox(frmDer, state="readonly",textvariable=inputUsuario, values=opcionesCBox)
+entryIDSucursal.grid(column=0, row=0)
+entryIDSucursal.bind("<<ComboboxSelected>>", verificar)
+
+ttk.Label(frmIzq, text="Nombre Sucursal").grid(column=0, row=1, pady=(4, 3), sticky='w')
+textoEntryNombreSucursal = StringVar()
+entryNombreSucursal = ttk.Entry(frmDer, state="disabled", textvariable=textoEntryNombreSucursal).grid(column=0, row=1) # Configurar esto cuando se ingrese el ID para que muestre el nombre de sucursal
+
+ttk.Label(frmIzq, text="Nombre Equipo").grid(column=0, row=2, sticky='w')
 
 textoEntryNombreEquipo = StringVar()
 entryNombreEquipo = ttk.Entry(frmDer, state="disabled", textvariable=textoEntryNombreEquipo).grid(column=0, row=3)
@@ -130,8 +136,8 @@ entryNombreEquipo = ttk.Entry(frmDer, state="disabled", textvariable=textoEntryN
 buttonConfigurar = ttk.Button(frmDer, text="Configurar archivos", command=configurar).grid(column=0, row=4, sticky='ew')
 
 selected = StringVar()
-ttk.Radiobutton(frmDer, text="Maestro", value="Maestro",variable=selected).grid(column=2, row=0, sticky='e', padx=(10,0))
-ttk.Radiobutton(frmDer, text="Esclavo", value="Esclavo",variable=selected).grid(column=3, row=0, sticky='e')
+selected.set("Maestro")
+ttk.Radiobutton(frmDer, text="Esclavo", value="Esclavo",variable=selected, command=lambda: verificar(None)).grid(column=3, row=0, sticky='e')
+ttk.Radiobutton(frmDer, text="Maestro", value="Maestro",variable=selected, command=lambda: verificar(None)).grid(column=2, row=0, sticky='e', padx=(10,0))
 
-buttonVerificar = ttk.Button(frmDer, text="Verificar", command=verificar).grid(column=4, row=0)
 root.mainloop()
